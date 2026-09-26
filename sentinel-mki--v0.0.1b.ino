@@ -4,7 +4,9 @@
 // Must exactly match Guard's RadioHead bitrate and its TX pin configuration.
 constexpr uint16_t RADIO_BITRATE = 2000;
 constexpr uint8_t RX_PIN = 2;
-
+constexpr uint8_t BZ_PIN = 8; // buzzer pin
+constexpr uint8_t CS_PIN = 13;
+ 
 // bitrate, receive pin, unused transmit pin, unused PTT pin
 RH_ASK radio(RADIO_BITRATE, RX_PIN, 3, 4);
 
@@ -18,6 +20,14 @@ void setup() {
     while (true) {
     } 
   }
+
+  // Turning on the CS pin of the RX
+  pinMode(CS_PIN, OUTPUT);
+  digitalWrite(CS_PIN, HIGH);
+
+  // TEST -- Setting the buzzer pin high.
+  pinMode(BZ_PIN, OUTPUT);
+  digitalWrite(BZ_PIN, LOW);
 
   Serial.println("Sentinel ready. Waiting for Guard IDs...");
 }
@@ -36,4 +46,6 @@ void loop() {
       Serial.println((char *)received);
     }
   }
+
+  digitalWrite(BZ_PIN, LOW);
 }
