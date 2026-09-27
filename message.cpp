@@ -42,7 +42,7 @@ Message::Message() {
   strncpy(this->text, "", sizeof(this->text) - 1);
   this->text[sizeof(this->text) - 1] = '\0';
 }
- 
+
 Message::Message(MessageType type) {
   this->type = type;
   DeviceID deviceID;
@@ -66,7 +66,7 @@ Message::Message(MessageType type, DeviceID deviceID, const char* message) {
   this->text[sizeof(this->text) - 1] = '\0';
 }
 
-int Message::getType() {
+MessageType Message::getType() const {
   return this->type;
 }
 const char* Message::getID() const {

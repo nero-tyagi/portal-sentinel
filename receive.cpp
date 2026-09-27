@@ -18,12 +18,6 @@ Message unwrapMessage(const char* message) {
     Message message(msgType, deviceID, text);
     return message;
   }
-  
-  Serial.print("JSON parse error: ");
-  Serial.println(err.c_str());
-
-  Serial.print("Received message: ");
-  Serial.println(message);
 
   return Message(MessageType::ERROR);
 }

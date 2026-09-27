@@ -8,7 +8,7 @@ static constexpr int MESSAGE_SIZE = 255;
 static constexpr int UUID_SIZE = 127;
 static constexpr int SN_SIZE = 33;
 
-enum MessageType {
+enum class MessageType {
   HEARTBEAT,
   ALARMON,
   ALARMOFF,
@@ -27,7 +27,7 @@ private:
 public:
   DeviceID();
   DeviceID(const char* id);
-  
+
   const char* getID() const;
 };
 
@@ -42,8 +42,8 @@ public:
   Message(MessageType type);
   Message(MessageType type, const char* message);
   Message(MessageType type, DeviceID deviceID, const char* message);
-  
-  int getType();
+
+  MessageType getType() const;
   const char* getID() const;
   const char* getText() const;
 };
