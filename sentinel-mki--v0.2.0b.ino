@@ -1,5 +1,6 @@
 #include <RH_ASK.h>
 #include <SPI.h>  // RadioHead requires this include.
+#include "receive.h"
 
 // Must exactly match Guard's RadioHead bitrate and its TX pin configuration.
 constexpr uint16_t RADIO_BITRATE = 2000;
@@ -29,21 +30,38 @@ void setup() {
   pinMode(BZ_PIN, OUTPUT);
   digitalWrite(BZ_PIN, LOW);
 
-  Serial.println("Sentinel ready. Waiting for Guard IDs...");
+  Serial.println("Sentinel ready. Awaiting Guard's messages...");
 }
 
 void loop() {
   // Extra byte allows us to add a string terminator safely.
   uint8_t received[RH_ASK_MAX_MESSAGE_LEN + 1];
-  uint8_t receivedLength = RH_ASK_MAX_MESSAGE_LEN;
 
   while(true) {
+    uint8_t receivedLength = RH_ASK_MAX_MESSAGE_LEN;
+
     // True only when RadioHead detects a complete, valid packet.
     if (radio.recv(received, &receivedLength)) {
-      received[receivedLength] = '\0';
+      received[receivedLength] = '\0'; // closing the string
 
-      Serial.print("Received Guard ID: ");
-      Serial.println((char *)received);
+      Message transmission;
+      transmission = unwrapMessage(reinterpret_cast<const char*>(received));
+      char transmission_text[TRANSMISSION_SIZE];
+      snprintf(transmission_text, sizeof(transmission_text),
+        "Received transmission: {type:%i,id:%s,msg:%s}",
+        transmission.getType(), transmission.getID(), transmission.getText());
+      Serial.println(transmission_text);
+
+      if (transmission.getType() == MessageType::ALARMON) {
+        Serial.println("Alarm on");
+        digitalWrite(BZ_PIN, HIGH);
+      } else if (transmission.getType() == MessageType::ALARMOFF) {
+        Serial.println("Alarm off");
+        digitalWrite(BZ_PIN, LOW);
+      } else if (transmission.getType() == MessageType::HEARTBEAT) {
+        Serial.println("Heartbeat");
+        digitalWrite(BZ_PIN, LOW);
+      };
     }
   }
 
